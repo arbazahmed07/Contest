@@ -8,9 +8,10 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { CheatingLogProvider } from './context/CheatingLogContext';
 import { HelmetProvider } from 'react-helmet-async';
+import { modernTheme } from './theme/modernTheme';
 
 function App() {
-  const theme = baselightTheme;
+  const theme = modernTheme;
   return (
     <HelmetProvider>
       <ThemeProvider theme={theme}>

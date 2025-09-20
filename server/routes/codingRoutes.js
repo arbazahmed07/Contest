@@ -18,7 +18,7 @@ router.post("/submit", submitCodingAnswer);
 router.get("/questions/exam/:examId", getCodingQuestionsByExamId);
 
 // Teacher routes
-router.post("/question", createCodingQuestion);
+router.post("/questions", createCodingQuestion);
 router.get("/questions", getCodingQuestions);
 router.get("/questions/:id", getCodingQuestion);
 

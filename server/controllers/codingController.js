@@ -152,8 +152,13 @@ const getCodingQuestionsByExamId = asyncHandler(async (req, res) => {
     console.log("Found question:", question);
 
     if (!question) {
-      res.status(404);
-      throw new Error(`No coding question found for exam: ${examId}`);
+      res.status(404).json({
+        success: false,
+        message: `No coding question found for exam: ${examId}`,
+        code: 'NO_CODING_QUESTION',
+        examId: examId,
+      });
+      return;
     }
 
     res.status(200).json({

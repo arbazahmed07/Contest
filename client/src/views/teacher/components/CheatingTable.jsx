@@ -46,6 +46,15 @@ export default function CheatingTable() {
     skip: !selectedExamId,
   });
 
+  // Debug logging
+  console.log('ExamsData:', examsData);
+  console.log('ExamsLoading:', examsLoading);
+  console.log('ExamsError:', examsError);
+  console.log('SelectedExamId:', selectedExamId);
+  console.log('CheatingLogsData:', cheatingLogsData);
+  console.log('LogsLoading:', logsLoading);
+  console.log('LogsError:', logsError);
+
   useEffect(() => {
     if (examsData && examsData.length > 0) {
       const firstExam = examsData[0];
@@ -89,8 +98,11 @@ export default function CheatingTable() {
 
   if (examsLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <CircularProgress />
+      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress sx={{ color: '#8B5CF6' }} />
+        <Typography sx={{ mt: 2, color: 'text.secondary' }}>
+          Loading exams...
+        </Typography>
       </Box>
     );
   }
@@ -98,8 +110,14 @@ export default function CheatingTable() {
   if (examsError) {
     return (
       <Box p={2}>
-        <Typography color="error">
-          Error loading exams: {examsError.data?.message || examsError.error || 'Unknown error'}
+        <Typography color="error" variant="h6" gutterBottom>
+          Error loading exams
+        </Typography>
+        <Typography color="error" variant="body2">
+          {examsError.data?.message || examsError.error || 'Unknown error occurred'}
+        </Typography>
+        <Typography variant="body2" sx={{ mt: 1 }}>
+          Please check your internet connection and try again.
         </Typography>
       </Box>
     );
@@ -107,8 +125,13 @@ export default function CheatingTable() {
 
   if (!examsData || examsData.length === 0) {
     return (
-      <Box p={2}>
-        <Typography>No exams available. Please create an exam first.</Typography>
+      <Box p={3} textAlign="center">
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          No Exams Available
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Please create an exam first to view monitoring logs.
+        </Typography>
       </Box>
     );
   }
@@ -144,13 +167,22 @@ export default function CheatingTable() {
       </Paper>
 
       {logsLoading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-          <CircularProgress />
+        <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="200px">
+          <CircularProgress sx={{ color: '#8B5CF6' }} />
+          <Typography sx={{ mt: 2, color: 'text.secondary' }}>
+            Loading cheating logs for selected exam...
+          </Typography>
         </Box>
       ) : logsError ? (
         <Box p={2}>
-          <Typography color="error">
-            Error loading logs: {logsError.data?.message || logsError.error || 'Unknown error'}
+          <Typography color="error" variant="h6" gutterBottom>
+            Error loading logs
+          </Typography>
+          <Typography color="error" variant="body2">
+            {logsError.data?.message || logsError.error || 'Unknown error occurred'}
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            Please try selecting a different exam or refresh the page.
           </Typography>
         </Box>
       ) : (
@@ -171,8 +203,18 @@ export default function CheatingTable() {
             <TableBody>
               {filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} align="center">
-                    No cheating logs found for this exam
+                  <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                    <Box>
+                      <Typography variant="h6" color="text.secondary" gutterBottom>
+                        No cheating logs found
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {filter 
+                          ? `No logs match your search "${filter}"`
+                          : `No monitoring data available for "${examsData.find(exam => exam.examId === selectedExamId)?.examName || 'this exam'}"`
+                        }
+                      </Typography>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ) : (

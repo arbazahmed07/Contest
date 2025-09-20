@@ -1,18 +1,18 @@
 import React from 'react';
 import { Typography, Box, Button, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { IconCode, IconChecklist } from '@tabler/icons-react';
+import { IconChecklist } from '@tabler/icons-react';
 import PageContainer from '../../components/container/PageContainer';
 import DashboardCard from '../../components/shared/DashboardCard';
-import AddQuestionForm from './components/AddQuestionForm';
+import AddCodingQuestionForm from './components/AddCodingQuestionForm';
 
-const AddQuestions = () => {
+const AddCodingQuestions = () => {
   const navigate = useNavigate();
 
   return (
-    <PageContainer title="Add Questions" description="Create multiple choice questions for exams">
+    <PageContainer title="Add Coding Questions" description="Create programming challenges for exams">
       <DashboardCard 
-        title="Multiple Choice Questions"
+        title="Programming Questions"
         sx={{
           background: 'linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%)',
           border: '1px solid #E5E7EB',
@@ -21,46 +21,46 @@ const AddQuestions = () => {
       >
         <Box sx={{ mb: 3 }}>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-            Create multiple choice questions with various options for your students.
+            Create coding challenges and programming problems for your students to solve during exams.
           </Typography>
           
-          {/* Navigation to Coding Questions */}
-          <Paper sx={{ p: 2, backgroundColor: '#F0F9FF', border: '1px solid #E0F2FE', borderRadius: 2 }}>
+          {/* Navigation to MCQ Questions */}
+          <Paper sx={{ p: 2, backgroundColor: '#F0FDF4', border: '1px solid #DCFCE7', borderRadius: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <IconCode size={24} color="#0EA5E9" />
+                <IconChecklist size={24} color="#22C55E" />
                 <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#0C4A6E' }}>
-                    Need to add coding questions?
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#14532D' }}>
+                    Need to add multiple choice questions?
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Create programming challenges and coding problems for your exams.
+                    Create MCQ questions with multiple options for your exams.
                   </Typography>
                 </Box>
               </Box>
               <Button
                 variant="contained"
-                startIcon={<IconCode size={16} />}
-                onClick={() => navigate('/add-coding-questions')}
+                startIcon={<IconChecklist size={16} />}
+                onClick={() => navigate('/add-questions')}
                 sx={{
-                  background: 'linear-gradient(135deg, #0EA5E9 0%, #06B6D4 100%)',
+                  background: 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)',
                   borderRadius: 2,
                   px: 3,
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #0284C7 0%, #0891B2 100%)',
+                    background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
                   },
                 }}
               >
-                Add Coding Questions
+                Add MCQ Questions
               </Button>
             </Box>
           </Paper>
         </Box>
         
-        <AddQuestionForm />
+        <AddCodingQuestionForm />
       </DashboardCard>
     </PageContainer>
   );
 };
 
-export default AddQuestions;
+export default AddCodingQuestions;

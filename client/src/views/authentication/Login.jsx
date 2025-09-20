@@ -82,23 +82,33 @@ const Login = () => {
   };
 
   return (
-    <PageContainer title="Login" description="this is Login page">
+    <PageContainer title="Login" description="Sign in to your account">
       <Box
         sx={{
           position: 'relative',
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
           '&:before': {
             content: '""',
-            background: 'radial-gradient(#d2f1df, #d3d7fa, #bad8f4)',
-            backgroundSize: '400% 400%',
-            animation: 'gradient 15s ease infinite',
             position: 'absolute',
-            height: '100%',
-            width: '100%',
-            opacity: '0.3',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%)',
           },
         }}
       >
-        <Grid container spacing={0} justifyContent="center" sx={{ height: '100vh' }}>
+        <Grid
+          container
+          spacing={0}
+          justifyContent="center"
+          sx={{ 
+            height: '100vh',
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
           <Grid
             item
             xs={12}
@@ -109,41 +119,67 @@ const Login = () => {
             justifyContent="center"
             alignItems="center"
           >
-            <Card elevation={9} sx={{ p: 4, zIndex: 1, width: '100%', maxWidth: '500px' }}>
-              <Box display="flex" alignItems="center" justifyContent="center">
+            <Card
+              elevation={0}
+              sx={{
+                p: 4,
+                zIndex: 1,
+                width: '100%',
+                maxWidth: '450px',
+                borderRadius: 3,
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              }}
+            >
+              <Box display="flex" alignItems="center" justifyContent="center" mb={3}>
                 <Typography
-                  variant="h4" // Choose a suitable variant (h1, h2, h3, h4, h5, h6, subtitle1, subtitle2, body1, body2, etc.)
-                  component="h1" // This will render an <h1> element
-                  style={{
-                    fontWeight: 'bold',
-                    color: '#1976d2', // Primary color or any color you prefer
-                    margin: '20px 0',
+                  variant="h3"
+                  sx={{
+                    background: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    fontWeight: 700,
+                    letterSpacing: '-0.02em',
                     textAlign: 'center',
-                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.3)', // Optional shadow effect
                   }}
                 >
-                  AI_Evalu8
+                  Contest
                 </Typography>
               </Box>
               <AuthLogin
                 formik={formik}
                 subtext={
-                  <Typography variant="subtitle1" textAlign="center" color="textSecondary" mb={1}>
+                  <Typography 
+                    variant="subtitle1" 
+                    textAlign="center" 
+                    color="text.secondary" 
+                    mb={3}
+                    sx={{ fontWeight: 500 }}
+                  >
                     CONDUCT SECURE ONLINE EXAMS NOW
                   </Typography>
                 }
                 subtitle={
                   <Stack direction="row" spacing={1} justifyContent="center" mt={3}>
-                    <Typography color="textSecondary" variant="h6" fontWeight="500">
-                      New to Modernize?
+                    <Typography color="text.secondary" variant="body1" fontWeight="400">
+                      New to Contest?
                     </Typography>
                     <Typography
                       component={Link}
                       to="/auth/register"
-                      fontWeight="500"
+                      fontWeight="600"
                       sx={{
                         textDecoration: 'none',
-                        color: 'primary.main',
+                        background: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        '&:hover': {
+                          textDecoration: 'underline',
+                        },
                       }}
                     >
                       Create an account

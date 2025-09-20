@@ -153,133 +153,315 @@ const ResultPage = () => {
   // Student View
   if (userInfo?.role === 'student') {
     return (
-      <PageContainer title="My Exam Results" description="View your exam results">
-        <Grid container spacing={3}>
-          {/* Summary Cards */}
-          <Grid item xs={12} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Total Exams Taken
-                </Typography>
-                <Typography variant="h3">{results.length}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Average Score
-                </Typography>
-                <Typography variant="h3">
-                  {results.length > 0
-                    ? `${(
-                        results.reduce((acc, curr) => acc + curr.percentage, 0) / results.length
-                      ).toFixed(1)}%`
-                    : '0%'}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Total Submissions
-                </Typography>
-                <Typography variant="h3">
-                  {results.reduce((acc, curr) => acc + (curr.codingSubmissions?.length || 0), 0)}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+      <PageContainer 
+        title="My Exam Results" 
+        description="View your exam results"
+        sx={{ backgroundColor: '#FFFFFF', minHeight: '100vh' }}
+      >
+          <Grid container spacing={3}>
+            {/* Summary Cards */}
+            <Grid item xs={12} md={4}>
+              <Card sx={{ 
+                borderRadius: 3,
+                boxShadow: '0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                border: '1px solid #E5E7EB',
+                background: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+                color: '#ffffff',
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0px 10px 15px -3px rgba(139, 92, 246, 0.3), 0px 4px 6px -2px rgba(139, 92, 246, 0.1)',
+                },
+              }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h6" gutterBottom sx={{ color: '#ffffff', fontWeight: 600 }}>
+                    Total Exams Taken
+                  </Typography>
+                  <Typography variant="h3" sx={{ color: '#ffffff', fontWeight: 700 }}>
+                    {results.length}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Card sx={{ 
+                borderRadius: 3,
+                boxShadow: '0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                border: '1px solid #E5E7EB',
+                background: 'linear-gradient(135deg, #06B6D4 0%, #67E8F9 100%)',
+                color: '#ffffff',
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0px 10px 15px -3px rgba(6, 182, 212, 0.3), 0px 4px 6px -2px rgba(6, 182, 212, 0.1)',
+                },
+              }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h6" gutterBottom sx={{ color: '#ffffff', fontWeight: 600 }}>
+                    Average Score
+                  </Typography>
+                  <Typography variant="h3" sx={{ color: '#ffffff', fontWeight: 700 }}>
+                    {results.length > 0
+                      ? `${(
+                          results.reduce((acc, curr) => acc + curr.percentage, 0) / results.length
+                        ).toFixed(1)}%`
+                      : '0%'}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Card sx={{ 
+                borderRadius: 3,
+                boxShadow: '0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                border: '1px solid #E5E7EB',
+                background: 'linear-gradient(135deg, #10B981 0%, #6EE7B7 100%)',
+                color: '#ffffff',
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0px 10px 15px -3px rgba(16, 185, 129, 0.3), 0px 4px 6px -2px rgba(16, 185, 129, 0.1)',
+                },
+              }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h6" gutterBottom sx={{ color: '#ffffff', fontWeight: 600 }}>
+                    Total Submissions
+                  </Typography>
+                  <Typography variant="h3" sx={{ color: '#ffffff', fontWeight: 700 }}>
+                    {results.reduce((acc, curr) => acc + (curr.codingSubmissions?.length || 0), 0)}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
 
-          {/* Results Table */}
-          <Grid item xs={12}>
-            <DashboardCard title="My Results">
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Exam Name</TableCell>
-                      <TableCell>MCQ Score</TableCell>
-                      <TableCell>Coding Submissions</TableCell>
-                      <TableCell>Total Score</TableCell>
-                      <TableCell>Submission Date</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {results.map((result) => (
-                      <TableRow key={result._id}>
-                        <TableCell>{result.examId?.examName || 'Exam'}</TableCell>
-                        <TableCell>
-                          <Chip
-                            label={`${result.percentage.toFixed(1)}%`}
-                            color={result.percentage >= 70 ? 'success' : 'warning'}
-                          />
+            {/* Results Table */}
+            <Grid item xs={12}>
+              <DashboardCard 
+                title="My Results"
+                sx={{ 
+                  borderRadius: 3,
+                  boxShadow: '0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                  border: '1px solid #E5E7EB',
+                  backgroundColor: '#FFFFFF',
+                }}
+              >
+                <TableContainer 
+                  component={Paper} 
+                  sx={{ 
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 2,
+                    border: '1px solid #E5E7EB',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <Table sx={{ '& .MuiTableCell-root': { borderColor: '#E5E7EB' } }}>
+                    <TableHead sx={{ backgroundColor: '#F9FAFB' }}>
+                      <TableRow>
+                        <TableCell sx={{ 
+                          color: '#374151', 
+                          fontWeight: 600,
+                          fontSize: '0.875rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                        }}>
+                          Exam Name
                         </TableCell>
-                        <TableCell>
-                          <Box display="flex" alignItems="center" gap={1}>
-                            <CheckCircle color="success" fontSize="small" />
-                          </Box>
+                        <TableCell sx={{ 
+                          color: '#374151', 
+                          fontWeight: 600,
+                          fontSize: '0.875rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                        }}>
+                          MCQ Score
                         </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" color="textSecondary">
-                            Total: {result.totalMarks}
-                          </Typography>
+                        <TableCell sx={{ 
+                          color: '#374151', 
+                          fontWeight: 600,
+                          fontSize: '0.875rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                        }}>
+                          Coding Submissions
                         </TableCell>
-                        <TableCell>{new Date(result.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell>
-                          {result.codingSubmissions?.length > 0 && (
-                            <IconButton onClick={() => handleViewCode(result)}>
-                              <Code />
-                            </IconButton>
-                          )}
+                        <TableCell sx={{ 
+                          color: '#374151', 
+                          fontWeight: 600,
+                          fontSize: '0.875rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                        }}>
+                          Total Score
+                        </TableCell>
+                        <TableCell sx={{ 
+                          color: '#374151', 
+                          fontWeight: 600,
+                          fontSize: '0.875rem',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                        }}>
+                          Submission Date
                         </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </DashboardCard>
+                    </TableHead>
+                    <TableBody>
+                      {results.map((result) => (
+                        <TableRow key={result._id} sx={{ 
+                          backgroundColor: '#FFFFFF',
+                          '&:hover': { backgroundColor: '#F9FAFB' },
+                          transition: 'background-color 0.2s ease-in-out',
+                        }}>
+                          <TableCell sx={{ 
+                            color: '#1F2937',
+                            fontWeight: 500,
+                          }}>
+                            {result.examId?.examName || 'Exam'}
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={`${result.percentage.toFixed(1)}%`}
+                              sx={{
+                                backgroundColor: result.percentage >= 70 ? '#10B981' : '#EF4444',
+                                color: '#ffffff',
+                                fontWeight: 600,
+                                borderRadius: 2,
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Box display="flex" alignItems="center" gap={1}>
+                              <CheckCircle sx={{ color: '#10B981' }} fontSize="small" />
+                              <Typography variant="body2" sx={{ color: '#6B7280' }}>
+                                {result.codingSubmissions?.length || 0} submissions
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2" sx={{ 
+                              color: '#1F2937',
+                              fontWeight: 500,
+                            }}>
+                              Total: {result.totalMarks}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ 
+                            color: '#6B7280',
+                            fontWeight: 500,
+                          }}>
+                            {new Date(result.createdAt).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            {result.codingSubmissions?.length > 0 && (
+                              <IconButton 
+                                onClick={() => handleViewCode(result)}
+                                sx={{ 
+                                  color: '#8B5CF6',
+                                  borderRadius: 2,
+                                  '&:hover': {
+                                    backgroundColor: 'rgba(139, 92, 246, 0.04)',
+                                  },
+                                }}
+                              >
+                                <Code />
+                              </IconButton>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </DashboardCard>
+            </Grid>
           </Grid>
-        </Grid>
 
-        {/* Code View Dialog */}
-        <Dialog
-          open={codeDialogOpen}
-          onClose={() => setCodeDialogOpen(false)}
-          maxWidth="md"
-          fullWidth
-        >
-          <DialogTitle>My Code Submissions</DialogTitle>
-          <DialogContent>
-            {selectedResult?.codingSubmissions?.map((submission, index) => (
-              <Box key={index} mb={3}>
-                <Typography variant="h6" gutterBottom>
-                  Question {index + 1}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" gutterBottom>
-                  Language: {submission.language}
-                </Typography>
-                <SyntaxHighlighter language={submission.language} style={docco}>
-                  {submission.code}
-                </SyntaxHighlighter>
-                <Box mt={1}>
-                  <Chip icon={<CheckCircle />} label="Success" color="success" />
-                  {submission.executionTime && (
-                    <Chip label={`Execution Time: ${submission.executionTime}ms`} sx={{ ml: 1 }} />
-                  )}
+          {/* Code Dialog */}
+          <Dialog 
+            open={codeDialogOpen} 
+            onClose={() => setCodeDialogOpen(false)} 
+            maxWidth="lg" 
+            fullWidth
+            PaperProps={{
+              sx: {
+                backgroundColor: '#FFFFFF',
+                borderRadius: 3,
+                boxShadow: '0px 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                border: '1px solid #E5E7EB',
+              },
+            }}
+          >
+            <DialogTitle sx={{ 
+              color: '#1F2937', 
+              backgroundColor: '#F9FAFB',
+              borderBottom: '1px solid #E5E7EB',
+              fontWeight: 600,
+            }}>
+              Code Submissions
+            </DialogTitle>
+            <DialogContent sx={{ backgroundColor: '#FFFFFF', p: 3 }}>
+              {selectedResult?.codingSubmissions?.map((submission, index) => (
+                <Box key={index} mb={3}>
+                  <Typography variant="h6" gutterBottom sx={{ 
+                    color: '#1F2937',
+                    fontWeight: 600,
+                  }}>
+                    Question {index + 1}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#6B7280' }} gutterBottom>
+                    Language: {submission.language}
+                  </Typography>
+                  <SyntaxHighlighter language={submission.language} style={docco}>
+                    {submission.code}
+                  </SyntaxHighlighter>
+                  <Box mt={1}>
+                    <Chip 
+                      icon={<CheckCircle />} 
+                      label="Success" 
+                      sx={{
+                        backgroundColor: '#10B981',
+                        color: '#ffffff',
+                        fontWeight: 600,
+                        borderRadius: 2,
+                      }}
+                    />
+                    {submission.executionTime && (
+                      <Chip 
+                        label={`Execution Time: ${submission.executionTime}ms`} 
+                        sx={{ 
+                          ml: 1,
+                          backgroundColor: '#F3F4F6',
+                          color: '#6B7280',
+                          borderRadius: 2,
+                        }} 
+                      />
+                    )}
+                  </Box>
                 </Box>
-              </Box>
-            ))}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setCodeDialogOpen(false)}>Close</Button>
-          </DialogActions>
-        </Dialog>
-      </PageContainer>
+              ))}
+            </DialogContent>
+            <DialogActions sx={{ 
+              backgroundColor: '#F9FAFB',
+              borderTop: '1px solid #E5E7EB',
+              p: 3,
+            }}>
+              <Button 
+                onClick={() => setCodeDialogOpen(false)}
+                variant="contained"
+                sx={{
+                  background: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+                  borderRadius: 2,
+                  px: 3,
+                  fontWeight: 600,
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%)',
+                  },
+                }}
+              >
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </PageContainer>
     );
   }
 

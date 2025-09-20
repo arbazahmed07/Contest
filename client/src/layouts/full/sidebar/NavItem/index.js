@@ -18,23 +18,27 @@ const NavItem = ({ item, level, pathDirect, onClick }) => {
 
   const ListItemStyled = styled(ListItem)(() => ({
     whiteSpace: 'nowrap',
-    marginBottom: '2px',
-    padding: '8px 10px',
-    borderRadius: '8px',
+    marginBottom: '6px',
+    padding: '12px 16px',
+    borderRadius: '12px',
     backgroundColor: level > 1 ? 'transparent !important' : 'inherit',
-    color:
-      theme.palette.text.secondary,
-    paddingLeft: '10px',
+    color: theme.palette.text.primary,
+    paddingLeft: '16px',
+    transition: 'all 0.2s ease-in-out',
+    fontWeight: 500,
     '&:hover': {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.primary.main,
+      backgroundColor: 'rgba(139, 92, 246, 0.08)',
+      color: '#8B5CF6',
+      transform: 'translateX(4px)',
     },
     '&.Mui-selected': {
-      color: 'white',
-      backgroundColor: theme.palette.primary.main,
+      color: '#ffffff',
+      background: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+      boxShadow: '0px 4px 12px rgba(139, 92, 246, 0.4)',
       '&:hover': {
-        backgroundColor: theme.palette.primary.main,
-        color: 'white',
+        background: 'linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%)',
+        color: '#ffffff',
+        transform: 'translateX(4px)',
       },
     },
   }));

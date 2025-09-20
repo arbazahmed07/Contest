@@ -7,6 +7,7 @@ import {
   IconTypography,
   IconUserPlus,
   IconPlayerPlayFilled,
+  IconCode,
 } from '@tabler/icons-react';
 
 import { uniqueId } from 'lodash';
@@ -54,6 +55,12 @@ const Menuitems = [
     title: 'Add Questions',
     icon: IconLogin,
     href: '/add-questions',
+  },
+  {
+    id: uniqueId(),
+    title: 'Add Coding Questions',
+    icon: IconCode,
+    href: '/add-coding-questions',
   },
   {
     id: uniqueId(),

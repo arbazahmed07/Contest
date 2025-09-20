@@ -17,7 +17,22 @@ import { useSaveCheatingLogMutation } from '../../slices/cheatingLogApiSlice'; /
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router';
-import { useCheatingLog } from 'src/context/CheatingLogContext';
+import { useCheatingLog } from '../../context/CheatingLogContext';
+
+// Add CSS animation for loading spinner
+const spinKeyframes = `
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+// Inject the CSS
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = spinKeyframes;
+  document.head.appendChild(style);
+}
 
 export default function Coder() {
   const [code, setCode] = useState('// Write your code here...');
@@ -40,7 +55,7 @@ export default function Coder() {
         email: userInfo.email,
       }));
     }
-  }, [userInfo]);
+  }, [userInfo, updateCheatingLog]);
 
   // Fetch coding question when component mounts
   useEffect(() => {
@@ -58,11 +73,24 @@ export default function Coder() {
             setCode(`// ${response.data.data.description}\n\n// Write your code here...`);
           }
         } else {
-          toast.error('No coding question found for this exam. Please contact your teacher.');
+          toast.error('No coding question found for this exam. This exam may only contain multiple choice questions.');
+          // Redirect back to the exam page or show alternative content
+          setTimeout(() => {
+            navigate(`/exam/${examId}`);
+          }, 3000);
         }
       } catch (error) {
         console.error('Error fetching coding question:', error);
-        toast.error(error?.response?.data?.message || 'Failed to load coding question');
+        const errorMessage = error?.response?.data?.message || 'Failed to load coding question';
+        
+        if (error?.response?.status === 404) {
+          toast.error('This exam does not have coding questions. You will be redirected to the multiple choice questions.');
+          setTimeout(() => {
+            navigate(`/exam/${examId}`);
+          }, 3000);
+        } else {
+          toast.error(errorMessage);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -71,7 +99,7 @@ export default function Coder() {
     if (examId) {
       fetchCodingQuestion();
     }
-  }, [examId]);
+  }, [examId, navigate]);
 
   const runCode = async () => {
     let apiUrl;
@@ -168,10 +196,69 @@ export default function Coder() {
   return (
     <Box sx={{ p: 3, height: '100vh', display: 'flex', flexDirection: 'column' }}>
       {isLoading ? (
-        <Box sx={{ textAlign: 'center', p: 3 }}>Loading question...</Box>
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            flex: 1,
+            gap: 2 
+          }}
+        >
+          <Typography variant="h6" color="text.secondary">
+            Loading coding question...
+          </Typography>
+          <Box sx={{ width: 40, height: 40, borderRadius: '50%', border: '4px solid #e0e0e0', borderTop: '4px solid #8B5CF6', animation: 'spin 1s linear infinite' }} />
+        </Box>
       ) : !question ? (
-        <Box sx={{ textAlign: 'center', p: 3 }}>
-          No coding question found for this exam. Please contact your teacher.
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            flex: 1,
+            gap: 3,
+            textAlign: 'center'
+          }}
+        >
+          <Box
+            sx={{
+              width: 80,
+              height: 80,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '2rem',
+            }}
+          >
+            📝
+          </Box>
+          <Typography variant="h5" color="text.primary" gutterBottom>
+            No Coding Question Available
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500 }}>
+            This exam doesn't contain coding questions. You will be redirected to the multiple choice questions shortly.
+          </Typography>
+          <Button 
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+              borderRadius: 2,
+              py: 1.5,
+              px: 4,
+              '&:hover': {
+                background: 'linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%)',
+              },
+            }}
+            onClick={() => navigate(`/exam/${examId}`)}
+          >
+            Go to Multiple Choice Questions
+          </Button>
         </Box>
       ) : (
         <Grid container spacing={2} sx={{ flex: 1, minHeight: 0 }}>

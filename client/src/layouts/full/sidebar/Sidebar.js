@@ -1,12 +1,17 @@
-import { useMediaQuery, Box, Drawer, Typography } from '@mui/material';
-import Logo from '../shared/logo/Logo';
+import { useMediaQuery, Box, Drawer, styled } from '@mui/material';
 import SidebarItems from './SidebarItems';
-// import { Upgrade } from './Updrade';
 
 const Sidebar = (props) => {
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
   const sidebarWidth = '270px';
+
+  const SidebarStyled = styled(Box)(({ theme }) => ({
+    background: 'linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%)',
+    color: theme.palette.text.primary,
+    borderRight: '1px solid #E5E7EB',
+    height: '100%',
+  }));
 
   if (lgUp) {
     return (
@@ -16,9 +21,6 @@ const Sidebar = (props) => {
           flexShrink: 0,
         }}
       >
-        {/* ------------------------------------------- */}
-        {/* Sidebar for desktop */}
-        {/* ------------------------------------------- */}
         <Drawer
           anchor="left"
           open={props.isSidebarOpen}
@@ -27,56 +29,15 @@ const Sidebar = (props) => {
             sx: {
               width: sidebarWidth,
               boxSizing: 'border-box',
+              background: 'linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%)',
+              borderRight: '1px solid #E5E7EB',
+              boxShadow: '0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.06)',
             },
           }}
         >
-          {/* ------------------------------------------- */}
-          {/* Sidebar Box */}
-          {/* ------------------------------------------- */}
-          <Box
-            sx={{
-              height: '100%',
-            }}
-          >
-            {/* ------------------------------------------- */}
-            {/* Logo */}
-            {/* ------------------------------------------- */}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                px: 3,
-                py: 2,
-                width: '100%',
-                gap: 2, // adds spacing between logo and text
-              }}
-            >
-              <Logo />
-
-              <Typography
-                variant="h2"
-                sx={{
-                  fontWeight: 600,
-                  fontSize: '1.2rem',
-                  color: 'primary.main',
-                  // ml: 10, // ❌ remove this as it pushes it too far right
-                  // mt: 1,  // ❌ remove unnecessary top margin
-                  whiteSpace: 'nowrap',
-                  mr: 5,
-                }}
-              >
-                AI_EVAL_8
-              </Typography>
-            </Box>
-
-            <Box>
-              {/* ------------------------------------------- */}
-              {/* Sidebar Items */}
-              {/* ------------------------------------------- */}
-              <SidebarItems />
-              {/* <Upgrade /> */}
-            </Box>
-          </Box>
+          <SidebarStyled sx={{ height: '100%' }}>
+            <SidebarItems />
+          </SidebarStyled>
         </Drawer>
       </Box>
     );
@@ -91,40 +52,15 @@ const Sidebar = (props) => {
       PaperProps={{
         sx: {
           width: sidebarWidth,
-          boxShadow: (theme) => theme.shadows[8],
+          boxShadow: '0px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          background: 'linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%)',
+          borderRight: '1px solid #E5E7EB',
         },
       }}
     >
-      {/* ------------------------------------------- */}
-      {/* Logo */}
-      {/* ------------------------------------------- */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          px: 2,
-          py: 2,
-          width: '100%',
-        }}
-      >
-        <Logo />
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 600,
-            fontSize: '1.2rem',
-            color: 'primary.main',
-            ml: 1,
-          }}
-        >
-          AI EVAL_8
-        </Typography>
-      </Box>
-      {/* ------------------------------------------- */}
-      {/* Sidebar For Mobile */}
-      {/* ------------------------------------------- */}
-      <SidebarItems />
-      {/* <Upgrade /> */}
+      <SidebarStyled sx={{ height: '100%' }}>
+        <SidebarItems />
+      </SidebarStyled>
     </Drawer>
   );
 };

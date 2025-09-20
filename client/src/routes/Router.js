@@ -26,6 +26,7 @@ const UserAccount = Loadable(lazy(() => import('../views/authentication/UserAcco
 const CreateExamPage = Loadable(lazy(() => import('../views/teacher/CreateExamPage')));
 const ExamLogPage = Loadable(lazy(() => import('../views/teacher/ExamLogPage')));
 const AddQuestions = Loadable(lazy(() => import('../views/teacher/AddQuestions')));
+const AddCodingQuestions = Loadable(lazy(() => import('../views/teacher/AddCodingQuestions')));
 const PrivateRoute = Loadable(lazy(() => import("../views/authentication/PrivateRoute")));
 const TeacherRoute = Loadable(lazy(() => import("../views/authentication/TeacherRoute")));
 
@@ -43,6 +44,7 @@ const Router = createBrowserRouter(
           <Route path="" element={<TeacherRoute />}>
             <Route path="/create-exam" exact={true} element={<CreateExamPage />} />
             <Route path="/add-questions" exact={true} element={<AddQuestions />} />
+            <Route path="/add-coding-questions" exact={true} element={<AddCodingQuestions />} />
             <Route path="/exam-log" exact={true} element={<ExamLogPage />} />
           </Route>/
         </Route>
