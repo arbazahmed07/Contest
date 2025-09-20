@@ -1,0 +1,83 @@
+{
+  "name": "client-vite",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@monaco-editor/react": "^4.6.0",
+    "@mui/icons-material": "^5.13.0",
+    "@mui/lab": "^5.0.0-alpha.137",
+    "@mui/material": "^5.13.4",
+    "@mui/x-data-grid": "^6.16.0",
+    "@mui/x-date-pickers": "^6.7.0",
+    "@reduxjs/toolkit": "^1.9.5",
+    "@tabler/icons-react": "^2.22.0",
+    "@tensorflow-models/coco-ssd": "^2.2.3",
+    "@tensorflow-models/face-detection": "^1.0.2",
+    "@tensorflow/tfjs": "^4.10.0",
+    "@uploadcare/upload-client": "^6.14.3",
+    "apexcharts": "^4.2.0",
+    "axios": "^1.7.9",
+    "chance": "^1.1.11",
+    "formik": "^2.4.4",
+    "html2canvas": "^1.4.1",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.513.0",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-apexcharts": "^1.7.0",
+    "react-countdown": "^2.3.5",
+    "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0",
+    "react-helmet-async": "^2.0.5",
+    "react-hot-toast": "^2.4.1",
+    "react-icons": "^5.3.0",
+    "react-redux": "^8.1.2",
+    "react-router-dom": "^6.12.1",
+    "react-spring": "^9.7.1",
+    "react-syntax-highlighter": "^15.6.6",
+    "react-toastify": "^9.1.3",
+    "react-webcam": "^7.1.1",
+    "stylis-plugin-rtl": "^2.1.1",
+    "sweetalert": "^2.1.2",
+    "web-vitals": "^3.3.2",
+    "yup": "^1.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "@types/react": "^18.2.6",
+    "@types/react-dom": "^18.2.4",
+    "@vitejs/plugin-react": "^5.0.2",
+    "eslint": "^9.35.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.4.0",
+    "vite": "^7.1.6"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
