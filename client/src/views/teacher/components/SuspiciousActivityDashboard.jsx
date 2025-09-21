@@ -41,6 +41,8 @@ import {
   PictureAsPdf,
   Archive,
 } from '@mui/icons-material';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { useGetExamsQuery } from '../../../slices/examApiSlice';
 import { useGetAllCheatingLogsQuery } from '../../../slices/cheatingLogApiSlice';
 
@@ -191,9 +193,129 @@ const SuspiciousActivityDashboard = () => {
     }
   };
 
+  const generatePDFReport = (data, title, filename) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    
+    // Header
+    doc.setFontSize(18);
+    doc.setTextColor(40, 40, 40);
+    doc.text(title, pageWidth / 2, 20, { align: 'center' });
+    
+    // Subtitle
+    doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, pageWidth / 2, 30, { align: 'center' });
+    
+    let yPosition = 45;
+    
+    if (data.type === 'evidence') {
+      // Evidence Report
+      doc.setFontSize(12);
+      doc.setTextColor(40, 40, 40);
+      doc.text(`Total Violations: ${data.totalViolations}`, 20, yPosition);
+      yPosition += 10;
+      doc.text(`Affected Students: ${data.affectedStudents}`, 20, yPosition);
+      yPosition += 20;
+      
+      // Evidence table
+      const evidenceTableData = data.evidence.map(item => [
+        item.studentName,
+        item.studentEmail,
+        item.examName,
+        item.totalViolations,
+        item.screenshotCount,
+        `Cell: ${item.violations.cellPhone || 0}, Multiple: ${item.violations.multipleFace || 0}, No Face: ${item.violations.noFace || 0}, Object: ${item.violations.prohibitedObject || 0}`
+      ]);
+      
+      autoTable(doc, {
+        head: [['Student Name', 'Email', 'Exam', 'Violations', 'Screenshots', 'Breakdown']],
+        body: evidenceTableData,
+        startY: yPosition,
+        theme: 'striped',
+        headStyles: { fillColor: [41, 128, 185] },
+        margin: { top: 10 },
+        styles: { fontSize: 8 },
+        columnStyles: {
+          0: { cellWidth: 30 },
+          1: { cellWidth: 40 },
+          2: { cellWidth: 30 },
+          3: { cellWidth: 20 },
+          4: { cellWidth: 20 },
+          5: { cellWidth: 50 }
+        }
+      });
+      
+    } else if (data.type === 'summary') {
+      // Summary Report
+      doc.setFontSize(12);
+      doc.setTextColor(40, 40, 40);
+      
+      // Summary statistics
+      doc.text('Summary Statistics:', 20, yPosition);
+      yPosition += 15;
+      
+      const summaryData = [
+        ['Total Violations', data.summary.totalViolations],
+        ['Total Screenshots', data.summary.totalScreenshots],
+        ['Students Monitored', data.summary.studentsMonitored],
+        ['Exams Monitored', data.examsMonitored],
+        ['Evidence Items', data.evidenceItems]
+      ];
+      
+      autoTable(doc, {
+        body: summaryData,
+        startY: yPosition,
+        theme: 'plain',
+        styles: { fontSize: 10 },
+        columnStyles: {
+          0: { fontStyle: 'bold', cellWidth: 60 },
+          1: { cellWidth: 40 }
+        }
+      });
+      
+      // Calculate approximate Y position after the table
+      yPosition = yPosition + (summaryData.length * 12) + 30;
+      
+      // Violation breakdown
+      doc.text('Violation Breakdown:', 20, yPosition);
+      yPosition += 10;
+      
+      const violationData = [
+        ['Cell Phone', data.summary.violationBreakdown.cellPhone],
+        ['Multiple Face', data.summary.violationBreakdown.multipleFace],
+        ['No Face', data.summary.violationBreakdown.noFace],
+        ['Prohibited Object', data.summary.violationBreakdown.prohibitedObject]
+      ];
+      
+      autoTable(doc, {
+        body: violationData,
+        startY: yPosition,
+        theme: 'striped',
+        headStyles: { fillColor: [231, 76, 60] },
+        styles: { fontSize: 10 },
+        columnStyles: {
+          0: { fontStyle: 'bold', cellWidth: 60 },
+          1: { cellWidth: 40 }
+        }
+      });
+    }
+    
+    // Footer
+    const footerY = pageHeight - 20;
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text('Contest Management System - Suspicious Activity Report', pageWidth / 2, footerY, { align: 'center' });
+    
+    // Save the PDF
+    doc.save(filename);
+  };
+
   const generateEvidenceReport = (evidenceItems) => {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const reportData = {
+      type: 'evidence',
       generatedAt: new Date().toISOString(),
       totalViolations: evidenceItems.reduce((sum, item) => sum + item.totalViolations, 0),
       affectedStudents: evidenceItems.length,
@@ -214,14 +336,7 @@ const SuspiciousActivityDashboard = () => {
       })),
     };
 
-    const jsonBlob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(jsonBlob);
-    link.download = `cheating-evidence-report-${timestamp}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
+    generatePDFReport(reportData, 'Cheating Evidence Report', `cheating-evidence-report-${timestamp}.pdf`);
   };
 
   const downloadSelectedEvidence = async () => {
@@ -300,6 +415,7 @@ const SuspiciousActivityDashboard = () => {
   const exportSummaryReport = () => {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const summaryData = {
+      type: 'summary',
       generatedAt: new Date().toISOString(),
       summary: {
         totalViolations: violationStats.totalViolations,
@@ -316,14 +432,7 @@ const SuspiciousActivityDashboard = () => {
       examsMonitored: examsData ? examsData.length : 0,
     };
 
-    const jsonBlob = new Blob([JSON.stringify(summaryData, null, 2)], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(jsonBlob);
-    link.download = `cheating-summary-report-${timestamp}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
+    generatePDFReport(summaryData, 'Cheating Summary Report', `cheating-summary-report-${timestamp}.pdf`);
   };
 
   const getViolationColor = (type) => {

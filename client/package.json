@@ -30,6 +30,8 @@
     "chance": "^1.1.11",
     "formik": "^2.4.4",
     "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.513.0",
     "prop-types": "^15.8.1",
