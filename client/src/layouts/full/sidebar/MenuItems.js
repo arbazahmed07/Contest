@@ -56,30 +56,14 @@ const Menuitems = [
     icon: IconLogin,
     href: '/add-questions',
   },
-  {
-    id: uniqueId(),
-    title: 'Add Coding Questions',
-    icon: IconCode,
-    href: '/add-coding-questions',
-  },
+
   {
     id: uniqueId(),
     title: 'Exam Logs',
     icon: IconUserPlus,
     href: '/exam-log',
   },
-  // {
-  //   id: uniqueId(),
-  //   title: 'Exam  Sale comp',
-  //   icon: IconPlayerPlayFilled,
-  //   href: '/generate-report',
-  // },
-  // {
-  //   id: uniqueId(),
-  //   title: 'Sample Page',
-  //   icon: IconAperture,
-  //   href: '/sample-page',
-  // },
+
 ];
 
 export default Menuitems;

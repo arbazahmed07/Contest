@@ -54,28 +54,35 @@ const TestPage = () => {
   };
 
   const handleTestSubmission = async () => {
-    if (isSubmitting) return; // Prevent multiple submissions
+    if (isSubmitting) return;
 
     try {
       setIsSubmitting(true);
 
-      // Make sure we have the latest user info in the log
+      // Prepare comprehensive cheating log data
       const updatedLog = {
-        ...cheatingLog,
+        examId: examId,
         username: userInfo.name,
         email: userInfo.email,
-        examId: examId,
         noFaceCount: parseInt(cheatingLog.noFaceCount) || 0,
         multipleFaceCount: parseInt(cheatingLog.multipleFaceCount) || 0,
         cellPhoneCount: parseInt(cheatingLog.cellPhoneCount) || 0,
         prohibitedObjectCount: parseInt(cheatingLog.prohibitedObjectCount) || 0,
+        screenshots: Array.isArray(cheatingLog.screenshots) ? cheatingLog.screenshots : []
       };
 
-      console.log('Submitting cheating log:', updatedLog);
+      console.log('Final cheating log submission:', updatedLog);
+      console.log('Total violations:', {
+        noFace: updatedLog.noFaceCount,
+        multipleFace: updatedLog.multipleFaceCount,
+        cellPhone: updatedLog.cellPhoneCount,
+        prohibitedObject: updatedLog.prohibitedObjectCount,
+        totalScreenshots: updatedLog.screenshots.length
+      });
 
       // Save the cheating log
       const result = await saveCheatingLogMutation(updatedLog).unwrap();
-      console.log('Cheating log saved:', result);
+      console.log('Cheating log saved successfully:', result);
 
       toast.success('Test submitted successfully!');
       navigate('/Success');

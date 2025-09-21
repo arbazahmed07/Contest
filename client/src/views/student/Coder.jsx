@@ -40,6 +40,7 @@ export default function Coder() {
   const [output, setOutput] = useState('');
   const [questionId, setQuestionId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [question, setQuestion] = useState(null);
   const { examId } = useParams();
   const navigate = useNavigate();
@@ -128,68 +129,63 @@ export default function Coder() {
   };
 
   const handleSubmit = async () => {
-    console.log('Starting submission with questionId:', questionId);
-    console.log('Current code:', code);
-    console.log('Selected language:', language);
-    console.log('Current cheating log:', cheatingLog);
-
+    if (isSubmitting) return;
+    
+    // Validate required data
     if (!questionId) {
-      toast.error('Question not loaded properly. Please try again.');
+      toast.error('No question ID found. Please reload the page and try again.');
       return;
     }
-
+    
+    if (!code || code.trim() === '// Write your code here...') {
+      toast.error('Please write some code before submitting.');
+      return;
+    }
+    
     try {
-      // First submit the code
+      setIsSubmitting(true);
+
+      // Submit code using direct API call
       const codeSubmissionData = {
-        code,
-        language,
-        questionId,
+        questionId: questionId,
+        language: language,
+        code: code,
       };
 
-      console.log('Submitting code with data:', codeSubmissionData);
-
-      const response = await axiosInstance.post('/api/coding/submit', codeSubmissionData, {
+      console.log('Submitting code:', codeSubmissionData);
+      
+      const codeResponse = await axiosInstance.post('/api/coding/submit', codeSubmissionData, {
         withCredentials: true,
       });
-      console.log('Submission response:', response.data);
+      
+      console.log('Code submitted successfully:', codeResponse.data);
 
-      if (response.data.success) {
-        try {
-          // Make sure we have the latest user info in the log
-          const updatedLog = {
-            ...cheatingLog,
-            username: userInfo.name,
-            email: userInfo.email,
-            examId: examId,
-            noFaceCount: parseInt(cheatingLog.noFaceCount) || 0,
-            multipleFaceCount: parseInt(cheatingLog.multipleFaceCount) || 0,
-            cellPhoneCount: parseInt(cheatingLog.cellPhoneCount) || 0,
-            prohibitedObjectCount: parseInt(cheatingLog.prohibitedObjectCount) || 0,
-            screenshots: cheatingLog.screenshots || [], // Ensure screenshots array exists
-          };
+      // Prepare comprehensive cheating log
+      const updatedLog = {
+        examId: examId,
+        username: userInfo.name,
+        email: userInfo.email,
+        noFaceCount: parseInt(cheatingLog.noFaceCount) || 0,
+        multipleFaceCount: parseInt(cheatingLog.multipleFaceCount) || 0,
+        cellPhoneCount: parseInt(cheatingLog.cellPhoneCount) || 0,
+        prohibitedObjectCount: parseInt(cheatingLog.prohibitedObjectCount) || 0,
+        screenshots: Array.isArray(cheatingLog.screenshots) ? cheatingLog.screenshots : []
+      };
 
-          console.log('Saving cheating log with screenshots:', updatedLog);
+      console.log('Final coding exam cheating log:', updatedLog);
 
-          // Save the cheating log
-          const logResult = await saveCheatingLogMutation(updatedLog).unwrap();
-          console.log('Cheating log saved successfully:', logResult);
+      // Save the cheating log
+      const logResult = await saveCheatingLogMutation(updatedLog).unwrap();
+      console.log('Cheating log saved successfully:', logResult);
 
-          toast.success('Test submitted successfully!');
-          navigate('/success');
-        } catch (cheatingLogError) {
-          console.error('Error saving cheating log:', cheatingLogError);
-          toast.error('Test submitted but failed to save monitoring logs');
-          navigate('/success');
-        }
-      } else {
-        console.error('Submission failed:', response.data);
-        toast.error('Failed to submit code');
-      }
+      toast.success('Test submitted successfully!');
+      navigate('/Success');
     } catch (error) {
-      console.error('Error during submission:', error.response?.data || error);
-      toast.error(
-        error?.response?.data?.message || error?.data?.message || 'Failed to submit test',
-      );
+      console.error('Submission error:', error);
+      const errorMessage = error?.response?.data?.message || error?.data?.message || error?.message || 'Failed to submit test';
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -326,9 +322,10 @@ export default function Coder() {
                   variant="contained"
                   color="primary"
                   onClick={handleSubmit}
+                  disabled={isSubmitting}
                   sx={{ minWidth: 120 }}
                 >
-                  Submit Test
+                  {isSubmitting ? 'Submitting...' : 'Submit Test'}
                 </Button>
               </Box>
             </Box>

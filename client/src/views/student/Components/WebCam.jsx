@@ -13,21 +13,13 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const [lastDetectionTime, setLastDetectionTime] = useState({});
-  const [screenshots, setScreenshots] = useState([]);
-
-  // Initialize screenshots array when component mounts
-  useEffect(() => {
-    if (cheatingLog && cheatingLog.screenshots) {
-      setScreenshots(cheatingLog.screenshots);
-    }
-  }, [cheatingLog]);
 
   const captureScreenshotAndUpload = async (type) => {
     const video = webcamRef.current?.video;
 
     if (
       !video ||
-      video.readyState !== 4 || // ensure video is ready
+      video.readyState !== 4 ||
       video.videoWidth === 0 ||
       video.videoHeight === 0
     ) {
@@ -52,12 +44,9 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
       const screenshot = {
         url: result.cdnUrl,
         type: type,
-        detectedAt: new Date()
+        detectedAt: new Date().toISOString()
       };
 
-      // Update local screenshots state
-      setScreenshots(prev => [...prev, screenshot]);
-      
       return screenshot;
     } catch (error) {
       console.error('❌ Upload failed:', error);
@@ -75,30 +64,32 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
       // Capture and upload screenshot
       const screenshot = await captureScreenshotAndUpload(type);
       
-      if (screenshot) {
-        // Update cheating log with new count and screenshot
-        const updatedLog = {
-          ...cheatingLog,
-          [`${type}Count`]: (cheatingLog[`${type}Count`] || 0) + 1,
-          screenshots: [...(cheatingLog.screenshots || []), screenshot]
-        };
+      // Update cheating log with new count and screenshot
+      const currentCount = parseInt(cheatingLog[`${type}Count`]) || 0;
+      const currentScreenshots = Array.isArray(cheatingLog.screenshots) ? cheatingLog.screenshots : [];
+      
+      const updatedLog = {
+        ...cheatingLog,
+        [`${type}Count`]: currentCount + 1,
+        screenshots: screenshot ? [...currentScreenshots, screenshot] : currentScreenshots
+      };
 
-        console.log('Updating cheating log with:', updatedLog);
-        updateCheatingLog(updatedLog);
-      }
+      console.log(`${type} detected. Updated log:`, updatedLog);
+      updateCheatingLog(updatedLog);
 
+      // Show warning to user
       switch (type) {
         case 'noFace':
-          swal('Face Not Visible', 'Warning Recorded', 'warning');
+          swal('Face Not Visible', 'Warning Recorded - Keep your face visible to the camera', 'warning');
           break;
         case 'multipleFace':
-          swal('Multiple Faces Detected', 'Warning Recorded', 'warning');
+          swal('Multiple Faces Detected', 'Warning Recorded - Only one person should be visible', 'warning');
           break;
         case 'cellPhone':
-          swal('Cell Phone Detected', 'Warning Recorded', 'warning');
+          swal('Cell Phone Detected', 'Warning Recorded - Remove all electronic devices', 'warning');
           break;
         case 'prohibitedObject':
-          swal('Prohibited Object Detected', 'Warning Recorded', 'warning');
+          swal('Prohibited Object Detected', 'Warning Recorded - Remove all prohibited items', 'warning');
           break;
         default:
           break;

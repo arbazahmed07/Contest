@@ -13,6 +13,7 @@ export const CheatingLogProvider = ({ children }) => {
     examId: '',
     username: userInfo?.name || '',
     email: userInfo?.email || '',
+    screenshots: [],
   });
 
   useEffect(() => {
@@ -27,18 +28,16 @@ export const CheatingLogProvider = ({ children }) => {
 
   const updateCheatingLog = (newLog) => {
     setCheatingLog((prev) => {
-      // Ensure all count fields are numbers and have default values
       const updatedLog = {
         ...prev,
         ...newLog,
         noFaceCount: Number(newLog.noFaceCount || prev.noFaceCount || 0),
         multipleFaceCount: Number(newLog.multipleFaceCount || prev.multipleFaceCount || 0),
         cellPhoneCount: Number(newLog.cellPhoneCount || prev.cellPhoneCount || 0),
-        prohibitedObjectCount: Number(
-          newLog.prohibitedObjectCount || prev.prohibitedObjectCount || 0,
-        ),
+        prohibitedObjectCount: Number(newLog.prohibitedObjectCount || prev.prohibitedObjectCount || 0),
+        screenshots: Array.isArray(newLog.screenshots) ? newLog.screenshots : prev.screenshots || [],
       };
-      console.log('Updated cheating log:', updatedLog); // Debug log
+      console.log('CheatingLog Context - Updated log:', updatedLog);
       return updatedLog;
     });
   };
@@ -52,8 +51,9 @@ export const CheatingLogProvider = ({ children }) => {
       examId: examId,
       username: userInfo?.name || '',
       email: userInfo?.email || '',
+      screenshots: [],
     };
-    console.log('Reset cheating log:', resetLog); // Debug log
+    console.log('Reset cheating log:', resetLog);
     setCheatingLog(resetLog);
   };
 
