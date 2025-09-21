@@ -8,7 +8,6 @@ import userRoutes from "./routes/userRoutes.js";
 import codingRoutes from "./routes/codingRoutes.js";
 import resultRoutes from "./routes/resultRoutes.js";
 import { exec } from "child_process";
-import fs from "fs";
 import { writeFileSync } from "fs";
 import path from "path";
 import cors from "cors";
@@ -80,15 +79,12 @@ app.use("/api/users", examRoutes);
 app.use("/api/users", resultRoutes);
 app.use("/api/coding", codingRoutes);
 
-// we we are deploying this in production
 // make frontend build then
 if (process.env.NODE_ENV === "production") {
   const __dirname = path.resolve();
   // we making front build folder static to serve from this app
   app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-  // if we get an routes that are not define by us we show then index html file
-  // every enpoint that is not api/users go to this index file
   app.get("*", (req, res) =>
     res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
   );
@@ -106,10 +102,3 @@ app.use(errorHandler);
 app.listen(port, () => {
   console.log(`server is running on http://localhost:${port}`);
 });
-
-// Todos:
-// -**POST /api/users**- Register a users
-// -**POST /api/users/auth**- Authenticate a user and get token
-// -**POST /api/users/logout**- logou user and clear cookie
-// -**GET /api/users/profile**- Get user Profile
-// -**PUT /api/users/profile**- Update user Profile

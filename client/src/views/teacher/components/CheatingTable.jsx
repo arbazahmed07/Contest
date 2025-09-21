@@ -23,12 +23,18 @@ import {
   IconButton,
   Tooltip,
   Chip,
+  Badge,
+  Avatar,
+  AvatarGroup,
+  Stack,
 } from '@mui/material';
 import { useGetExamsQuery } from '../../../slices/examApiSlice';
 import { useGetCheatingLogsQuery } from '../../../slices/cheatingLogApiSlice';
 import CloseIcon from '@mui/icons-material/Close';
 import ImageIcon from '@mui/icons-material/Image';
 import WarningIcon from '@mui/icons-material/Warning';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 export default function CheatingTable() {
   const [filter, setFilter] = useState('');
@@ -197,7 +203,7 @@ export default function CheatingTable() {
                 <TableCell>Multiple Face Count</TableCell>
                 <TableCell>Cell Phone Count</TableCell>
                 <TableCell>Prohibited Object Count</TableCell>
-                <TableCell>Screenshots</TableCell>
+                <TableCell>Suspicious Activity Evidence</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -256,14 +262,45 @@ export default function CheatingTable() {
                       />
                     </TableCell>
                     <TableCell>
-                      <Tooltip title="View Screenshots">
-                        <IconButton
-                          onClick={() => handleViewScreenshots(log)}
-                          disabled={!log.screenshots?.length}
-                        >
-                          <ImageIcon color={log.screenshots?.length ? 'primary' : 'disabled'} />
-                        </IconButton>
-                      </Tooltip>
+                      {log.screenshots && log.screenshots.length > 0 ? (
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <Badge badgeContent={log.screenshots.length} color="error">
+                            <AvatarGroup max={3} sx={{ '& .MuiAvatar-root': { width: 32, height: 32 } }}>
+                              {log.screenshots.slice(0, 3).map((screenshot, idx) => (
+                                <Avatar
+                                  key={idx}
+                                  src={screenshot.url}
+                                  alt={`${screenshot.type} violation`}
+                                  sx={{ 
+                                    cursor: 'pointer',
+                                    border: '2px solid',
+                                    borderColor: screenshot.type === 'cellPhone' ? 'error.main' : 
+                                               screenshot.type === 'multipleFace' ? 'warning.main' : 
+                                               screenshot.type === 'noFace' ? 'info.main' : 'secondary.main'
+                                  }}
+                                  onClick={() => handleViewScreenshots(log)}
+                                />
+                              ))}
+                            </AvatarGroup>
+                          </Badge>
+                          <Tooltip title={`View all ${log.screenshots.length} screenshots`}>
+                            <IconButton
+                              onClick={() => handleViewScreenshots(log)}
+                              size="small"
+                              color="primary"
+                            >
+                              <VisibilityIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      ) : (
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <PhotoCameraIcon color="disabled" />
+                          <Typography variant="caption" color="text.secondary">
+                            No captures
+                          </Typography>
+                        </Stack>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
@@ -273,40 +310,118 @@ export default function CheatingTable() {
         </TableContainer>
       )}
 
-      {/* Screenshots Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+      {/* Enhanced Screenshots Dialog */}
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="lg" fullWidth>
         <DialogTitle>
           <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6">Screenshots - {selectedLog?.username}</Typography>
+            <Box>
+              <Typography variant="h6">Suspicious Activity Evidence - {selectedLog?.username}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {selectedLog?.screenshots?.length} screenshot(s) captured • Exam: {selectedLog?.examId}
+              </Typography>
+            </Box>
             <IconButton onClick={handleCloseDialog}>
               <CloseIcon />
             </IconButton>
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Grid container spacing={2}>
-            {selectedLog?.screenshots?.map((screenshot, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <Card>
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={screenshot.url}
-                    alt={`Violation - ${screenshot.type}`}
-                    sx={{ objectFit: 'cover' }}
-                  />
-                  <CardContent>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Type: {screenshot.type}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Detected: {new Date(screenshot.detectedAt).toLocaleString()}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+          {selectedLog?.screenshots?.length === 0 ? (
+            <Box display="flex" flexDirection="column" alignItems="center" py={4}>
+              <PhotoCameraIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+              <Typography variant="h6" color="text.secondary">
+                No Screenshots Available
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                No suspicious activity was captured for this student.
+              </Typography>
+            </Box>
+          ) : (
+            <Grid container spacing={3}>
+              {selectedLog?.screenshots?.map((screenshot, index) => {
+                const getViolationTypeDetails = (type) => {
+                  switch (type) {
+                    case 'cellPhone':
+                      return { color: 'error', icon: '📱', label: 'Cell Phone Detected' };
+                    case 'multipleFace':
+                      return { color: 'warning', icon: '👥', label: 'Multiple Faces' };
+                    case 'noFace':
+                      return { color: 'info', icon: '🚫', label: 'No Face Visible' };
+                    case 'prohibitedObject':
+                      return { color: 'secondary', icon: '📚', label: 'Prohibited Object' };
+                    default:
+                      return { color: 'default', icon: '⚠️', label: 'Unknown Violation' };
+                  }
+                };
+
+                const violationDetails = getViolationTypeDetails(screenshot.type);
+
+                return (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Card 
+                      sx={{ 
+                        height: '100%',
+                        border: `2px solid`,
+                        borderColor: `${violationDetails.color}.main`,
+                        '&:hover': {
+                          transform: 'scale(1.02)',
+                          transition: 'transform 0.2s ease-in-out',
+                          boxShadow: 4
+                        }
+                      }}
+                    >
+                      <Box position="relative">
+                        <CardMedia
+                          component="img"
+                          height="200"
+                          image={screenshot.url}
+                          alt={`${violationDetails.label} - Evidence`}
+                          sx={{ 
+                            objectFit: 'cover',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => window.open(screenshot.url, '_blank')}
+                        />
+                        <Chip
+                          label={violationDetails.label}
+                          color={violationDetails.color}
+                          size="small"
+                          sx={{
+                            position: 'absolute',
+                            top: 8,
+                            left: 8,
+                            fontWeight: 'bold'
+                          }}
+                        />
+                      </Box>
+                      <CardContent>
+                        <Stack spacing={1}>
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <Typography variant="h6">{violationDetails.icon}</Typography>
+                            <Typography variant="subtitle2" fontWeight="bold">
+                              {violationDetails.label}
+                            </Typography>
+                          </Box>
+                          <Typography variant="caption" color="text.secondary">
+                            📅 {new Date(screenshot.detectedAt).toLocaleDateString()}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            🕐 {new Date(screenshot.detectedAt).toLocaleTimeString()}
+                          </Typography>
+                          <Chip
+                            label={`Evidence #${index + 1}`}
+                            variant="outlined"
+                            size="small"
+                            sx={{ alignSelf: 'flex-start' }}
+                          />
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          )}
         </DialogContent>
       </Dialog>
     </Box>

@@ -8,6 +8,7 @@ import {
   IconUserPlus,
   IconPlayerPlayFilled,
   IconCode,
+  IconShield,
 } from '@tabler/icons-react';
 
 import { uniqueId } from 'lodash';
@@ -62,6 +63,12 @@ const Menuitems = [
     title: 'Exam Logs',
     icon: IconUserPlus,
     href: '/exam-log',
+  },
+  {
+    id: uniqueId(),
+    title: 'Suspicious Activity',
+    icon: IconShield,
+    href: '/suspicious-activity',
   },
 
 ];

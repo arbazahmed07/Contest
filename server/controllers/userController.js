@@ -8,13 +8,14 @@ const authUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
-    generateToken(res, user._id);
+    const token = generateToken(user._id);
 
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
+      token: token, // Include token in response
       message: "User Successfully login with role: " + user.role,
     });
   } else {
@@ -41,13 +42,14 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
-    generateToken(res, user._id);
+    const token = generateToken(user._id);
 
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
+      token: token, // Include token in response
       password_encrypted: user.password,
       message: "User Successfully created with role: " + user.role,
     });
@@ -58,13 +60,9 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-  res.cookie("jwt", "", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "None",
-    expires: new Date(0),
-  });
-  res.status(200).json({ message: " User logout User" });
+  // Since we're using localStorage instead of cookies, 
+  // logout is handled on the frontend by clearing localStorage
+  res.status(200).json({ message: "User logout successful" });
 });
 
 const getUserProfile = asyncHandler(async (req, res) => {

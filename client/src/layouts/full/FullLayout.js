@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 
 import Header from './header/Header';
 import Sidebar from './sidebar/Sidebar';
+import SuspiciousActivityNotifications from '../../components/notifications/SuspiciousActivityNotifications';
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -66,6 +67,8 @@ const FullLayout = () => {
           {/* ------------------------------------------- */}
         </Container>
       </PageWrapper>
+      {/* Suspicious Activity Notifications for Teachers */}
+      <SuspiciousActivityNotifications />
     </MainWrapper>
   );
 };

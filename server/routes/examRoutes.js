@@ -12,6 +12,7 @@ import {
 } from "../controllers/quesController.js";
 import {
   getCheatingLogsByExamId,
+  getAllCheatingLogs,
   saveCheatingLog,
 } from "../controllers/cheatingLogController.js";
 const examRoutes = express.Router();
@@ -20,6 +21,7 @@ const examRoutes = express.Router();
 examRoutes.route("/exam").get(protect, getExams).post(protect, createExam);
 examRoutes.route("/exam/questions").post(protect, createQuestion);
 examRoutes.route("/exam/questions/:examId").get(protect, getQuestionsByExamId);
+examRoutes.route("/cheatingLogs/all").get(protect, getAllCheatingLogs);
 examRoutes.route("/cheatingLogs/:examId").get(protect, getCheatingLogsByExamId);
 examRoutes.route("/cheatingLogs/").post(protect, saveCheatingLog);
 examRoutes.route("/exam/:examId").post(protect, DeleteExamById);

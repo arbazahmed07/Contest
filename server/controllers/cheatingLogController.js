@@ -49,6 +49,14 @@ const saveCheatingLog = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc Get all cheating log data across all exams
+// @route GET /api/cheatingLogs/all
+// @access Private
+const getAllCheatingLogs = asyncHandler(async (req, res) => {
+  const cheatingLogs = await CheatingLog.find({});
+  res.status(200).json(cheatingLogs);
+});
+
 // @desc Get all cheating log data for a specific exam
 // @route GET /api/cheatingLogs/:examId
 // @access Private
@@ -59,4 +67,4 @@ const getCheatingLogsByExamId = asyncHandler(async (req, res) => {
   res.status(200).json(cheatingLogs);
 });
 
-export { saveCheatingLog, getCheatingLogsByExamId };
+export { saveCheatingLog, getAllCheatingLogs, getCheatingLogsByExamId };
