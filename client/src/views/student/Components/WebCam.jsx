@@ -1,5 +1,7 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-backend-webgl';
+import '@tensorflow/tfjs-backend-cpu';
 import * as cocossd from '@tensorflow-models/coco-ssd';
 import Webcam from 'react-webcam';
 import { drawRect } from './utilities';
@@ -14,7 +16,9 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
   const canvasRef = useRef(null);
   const [lastDetectionTime, setLastDetectionTime] = useState({});
 
-  const captureScreenshotAndUpload = async (type) => {
+  const captureScreenshotAndUpload = useCallback(async (type) => {
+    console.log(`🎯 Starting screenshot capture for: ${type}`);
+    
     const video = webcamRef.current?.video;
 
     if (
@@ -23,9 +27,16 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
       video.videoWidth === 0 ||
       video.videoHeight === 0
     ) {
-      console.warn('Video not ready for screenshot');
+      console.warn('❌ Video not ready for screenshot:', {
+        video: !!video,
+        readyState: video?.readyState,
+        videoWidth: video?.videoWidth,
+        videoHeight: video?.videoHeight
+      });
       return null;
     }
+
+    console.log(`📹 Video ready - dimensions: ${video.videoWidth}x${video.videoHeight}`);
 
     const canvas = document.createElement('canvas');
     canvas.width = video.videoWidth;
@@ -34,10 +45,14 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
     const context = canvas.getContext('2d');
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    const dataUrl = canvas.toDataURL('image/jpeg');
-    const file = dataURLtoFile(dataUrl, `cheating_${Date.now()}.jpg`);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.8); // Add quality parameter
+    console.log(`🖼️ Canvas created, data URL length: ${dataUrl.length}`);
+    
+    const file = dataURLtoFile(dataUrl, `cheating_${type}_${Date.now()}.jpg`);
+    console.log(`📁 File created:`, file);
 
     try {
+      console.log(`☁️ Uploading to Uploadcare...`);
       const result = await client.uploadFile(file);
       console.log('✅ Uploaded to Uploadcare:', result.cdnUrl);
       
@@ -50,19 +65,34 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
       return screenshot;
     } catch (error) {
       console.error('❌ Upload failed:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.status,
+        response: error.response
+      });
       return null;
     }
-  };
+  }, []);
 
-  const handleDetection = async (type) => {
+  const handleDetection = useCallback(async (type) => {
     const now = Date.now();
     const lastTime = lastDetectionTime[type] || 0;
 
+    console.log(`🚨 Detection triggered: ${type}, last detection: ${now - lastTime}ms ago`);
+
     if (now - lastTime >= 3000) {
+      console.log(`⏰ Cooldown passed, processing ${type} detection...`);
       setLastDetectionTime((prev) => ({ ...prev, [type]: now }));
 
       // Capture and upload screenshot
+      console.log(`📸 Attempting to capture screenshot for ${type}...`);
       const screenshot = await captureScreenshotAndUpload(type);
+      
+      if (screenshot) {
+        console.log(`✅ Screenshot captured successfully:`, screenshot);
+      } else {
+        console.warn(`❌ Screenshot capture failed for ${type}`);
+      }
       
       // Update cheating log with new count and screenshot
       const currentCount = parseInt(cheatingLog[`${type}Count`]) || 0;
@@ -74,7 +104,9 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
         screenshots: screenshot ? [...currentScreenshots, screenshot] : currentScreenshots
       };
 
-      console.log(`${type} detected. Updated log:`, updatedLog);
+      console.log(`📊 ${type} detected. Count: ${currentCount + 1}, Screenshots: ${updatedLog.screenshots.length}`);
+      console.log(`📝 Updated log:`, updatedLog);
+      
       updateCheatingLog(updatedLog);
 
       // Show warning to user
@@ -94,21 +126,12 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
         default:
           break;
       }
+    } else {
+      console.log(`⏳ Cooldown active for ${type}, ignoring detection (${3000 - (now - lastTime)}ms remaining)`);
     }
-  };
+  }, [lastDetectionTime, captureScreenshotAndUpload, cheatingLog, updateCheatingLog]);
 
-  const runCoco = async () => {
-    try {
-      const net = await cocossd.load();
-      console.log('AI model loaded.');
-      setInterval(() => detect(net), 1000);
-    } catch (error) {
-      console.error('Error loading model:', error);
-      swal('Error', 'Failed to load AI model. Please refresh the page.', 'error');
-    }
-  };
-
-  const detect = async (net) => {
+  const detect = useCallback(async (net) => {
     if (webcamRef.current && webcamRef.current.video && webcamRef.current.video.readyState === 4) {
       const video = webcamRef.current.video;
       const videoWidth = video.videoWidth;
@@ -127,31 +150,104 @@ export default function Home({ cheatingLog, updateCheatingLog }) {
 
         let person_count = 0;
         let faceDetected = false;
+        const detectedObjects = [];
 
         obj.forEach((element) => {
           const detectedClass = element.class;
-          console.log('Detected:', detectedClass);
+          const confidence = (element.score * 100).toFixed(1);
+          detectedObjects.push(`${detectedClass} (${confidence}%)`);
 
-          if (detectedClass === 'cell phone') handleDetection('cellPhone');
-          if (detectedClass === 'book' || detectedClass === 'laptop')
+          if (detectedClass === 'cell phone') {
+            console.log(`📱 Cell phone detected with ${confidence}% confidence`);
+            handleDetection('cellPhone');
+          }
+          if (detectedClass === 'book' || detectedClass === 'laptop') {
+            console.log(`📚 Prohibited object detected: ${detectedClass} with ${confidence}% confidence`);
             handleDetection('prohibitedObject');
+          }
           if (detectedClass === 'person') {
             faceDetected = true;
             person_count++;
-            if (person_count > 1) handleDetection('multipleFace');
+            console.log(`👤 Person detected (count: ${person_count}) with ${confidence}% confidence`);
+            if (person_count > 1) {
+              console.log(`👥 Multiple people detected: ${person_count}`);
+              handleDetection('multipleFace');
+            }
           }
         });
 
-        if (!faceDetected) handleDetection('noFace');
+        if (detectedObjects.length > 0) {
+          console.log(`🔍 Objects detected:`, detectedObjects.join(', '));
+        }
+
+        if (!faceDetected) {
+          console.log(`👻 No face detected - triggering noFace violation`);
+          handleDetection('noFace');
+        }
       } catch (error) {
-        console.error('Error during detection:', error);
+        console.error('❌ Error during detection:', error);
+      }
+    } else {
+      console.log('📹 Video not ready for detection');
+    }
+  }, [handleDetection]);
+
+  const runCoco = useCallback(async () => {
+    try {
+      console.log('🤖 Initializing TensorFlow.js...');
+      
+      // Set TensorFlow.js backend to webgl for better performance
+      if (!tf.getBackend()) {
+        console.log('🔧 Setting TensorFlow.js backend to webgl...');
+        await tf.setBackend('webgl');
+      }
+      
+      // Wait for TensorFlow.js to be ready
+      await tf.ready();
+      console.log('✅ TensorFlow.js backend ready:', tf.getBackend());
+      
+      console.log('🤖 Loading COCO-SSD model...');
+      const net = await cocossd.load();
+      console.log('✅ AI model loaded successfully');
+      const intervalId = setInterval(() => detect(net), 1000);
+      
+      // Return cleanup function
+      return () => clearInterval(intervalId);
+    } catch (error) {
+      console.error('❌ Error loading AI model:', error);
+      console.error('Available backends:', tf.engine().backendNames);
+      
+      // Try fallback to CPU backend
+      try {
+        console.log('🔄 Trying fallback to CPU backend...');
+        await tf.setBackend('cpu');
+        await tf.ready();
+        const net = await cocossd.load();
+        console.log('✅ AI model loaded with CPU backend');
+        const intervalId = setInterval(() => detect(net), 1000);
+        return () => clearInterval(intervalId);
+      } catch (fallbackError) {
+        console.error('❌ Fallback also failed:', fallbackError);
+        swal('Error', 'Failed to load AI model. Please refresh the page.', 'error');
+        return () => {};
       }
     }
-  };
+  }, [detect]);
 
   useEffect(() => {
-    runCoco();
-  }, []);
+    let cleanup = null;
+    
+    const initializeAI = async () => {
+      cleanup = await runCoco();
+    };
+    
+    initializeAI();
+    
+    // Cleanup interval on unmount
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [runCoco]);
 
   return (
     <Box>

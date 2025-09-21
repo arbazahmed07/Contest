@@ -15,14 +15,15 @@ import {
   AddPhotoAlternate,
   Delete,
 } from '@mui/icons-material';
-import axiosInstance from '../../../axios';
 import { useGetExamsQuery } from '../../../slices/examApiSlice';
+import { useSaveCheatingLogMutation } from '../../../slices/cheatingLogApiSlice';
 import { toast } from 'react-toastify';
 
 const TestDataGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const { data: examsData } = useGetExamsQuery();
+  const [saveCheatingLogMutation] = useSaveCheatingLogMutation();
 
   const sampleScreenshots = [
     {
@@ -48,30 +49,8 @@ const TestDataGenerator = () => {
   ];
 
   const generateTestData = async () => {
-    // Debug authentication - check multiple sources for token
-    let token = localStorage.getItem('token');
-    
-    if (!token) {
-      const userInfo = localStorage.getItem('userInfo');
-      if (userInfo) {
-        try {
-          const parsedUserInfo = JSON.parse(userInfo);
-          token = parsedUserInfo.token;
-        } catch (e) {
-          console.error('Error parsing userInfo for token:', e);
-        }
-      }
-    }
-    
-    console.log('Current token:', token ? 'Token exists' : 'No token found');
-    
     if (!examsData || examsData.length === 0) {
       toast.error('No exams found to generate test data for');
-      return;
-    }
-
-    if (!token) {
-      toast.error('No authentication token found. Please login again.');
       return;
     }
 
@@ -82,9 +61,9 @@ const TestDataGenerator = () => {
       
       // Generate multiple test logs with different students
       const testStudents = [
-        { name: 'John Doe', email: 'john@test.com' },
-        { name: 'Jane Smith', email: 'jane@test.com' },
-        { name: 'Bob Wilson', email: 'bob@test.com' },
+        { name: 'nlkdlknl', email: 'onononnjkn@mail.com' },
+        { name: 'Mohammad Arbaz', email: 'mdarbazking7@gmail.com' },
+        { name: 'Test Student', email: 'test@example.com' },
       ];
 
       for (let i = 0; i < testStudents.length; i++) {
@@ -95,17 +74,20 @@ const TestDataGenerator = () => {
           examId: firstExam.examId,
           username: student.name,
           email: student.email,
-          noFaceCount: Math.floor(Math.random() * 3),
-          multipleFaceCount: Math.floor(Math.random() * 2),
-          cellPhoneCount: Math.floor(Math.random() * 2),
+          noFaceCount: Math.floor(Math.random() * 3) + 1,
+          multipleFaceCount: Math.floor(Math.random() * 2) + 1,
+          cellPhoneCount: Math.floor(Math.random() * 2) + 1,
           prohibitedObjectCount: Math.floor(Math.random() * 2),
           screenshots: screenshotsForStudent
         };
 
         console.log(`Creating test data for ${student.name}:`, testData);
-        await axiosInstance.post('/api/users/cheatingLogs', testData);
-        console.log(`✅ Successfully created test data for ${student.name}`);
-        toast.success(`Created test data for ${student.name}`);
+        console.log(`Screenshots for ${student.name}:`, screenshotsForStudent);
+        
+        // Use Redux RTK Query mutation instead of direct axios call
+        const result = await saveCheatingLogMutation(testData).unwrap();
+        console.log(`✅ Successfully created test data for ${student.name}:`, result);
+        toast.success(`Created test data for ${student.name} with ${screenshotsForStudent.length} screenshots`);
       }
 
       toast.success('All test data generated successfully!');
@@ -113,12 +95,12 @@ const TestDataGenerator = () => {
       setTimeout(() => window.location.reload(), 2000);
     } catch (error) {
       console.error('Error generating test data:', error);
-      if (error.response?.status === 401) {
+      if (error?.status === 401) {
         toast.error('Authentication failed. Please login again.');
-      } else if (error.response?.data?.message) {
-        toast.error(`Failed to generate test data: ${error.response.data.message}`);
+      } else if (error?.data?.message) {
+        toast.error(`Failed to generate test data: ${error.data.message}`);
       } else {
-        toast.error('Failed to generate test data. Check console for details.');
+        toast.error('Failed to generate test data. Please try again.');
       }
     } finally {
       setIsGenerating(false);

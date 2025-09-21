@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../axios';
-
+import axios from 'axios';
 const SuspiciousActivityNotifications = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const [lastNotificationTime, setLastNotificationTime] = useState(Date.now());
@@ -19,7 +19,7 @@ const SuspiciousActivityNotifications = () => {
     const interval = setInterval(async () => {
       try {
         // Get all exams
-  const examsResponse = await axiosInstance.get(
+  const examsResponse = await axios.get(
   '/api/users/exam',
   {
     headers: {
@@ -36,7 +36,7 @@ const SuspiciousActivityNotifications = () => {
         for (const exam of exams) {
           try {
           
-          const logsResponse = await axiosInstance.get(
+          const logsResponse = await axios.get(
   `/api/users/cheatingLogs/${exam.examId}`,
   {
     headers: {
